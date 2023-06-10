@@ -56,14 +56,38 @@ async function run() {
     const coursesCollection = client.db("SummerCamp").collection("courses");
     const cartCollection = client.db("SummerCamp").collection("carts");
 
+       // ============= JWT TOKEN =============
+
+       app.post("/jwt", (req, res) => {
+        const user = req.body;
+        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: "1h",
+        });
+        res.send({ token });
+      });
+  
+      // ============= VERIFY ADMIN =============
+
+      const verifyAdmin = async (req, res, next) => {
+        const email = req.decoded.email;
+        const query = { email: email };
+        const user = await usersCollection.findOne(query);
+        if (user?.role !== "admin") {
+          return res
+            .status(403)
+            .send({ error: true, message: "forbidden message" });
+        }
+        next();
+      };
+
+      // ============= COURSES =============
 
     app.get("/courses", async (req, res) => {
       const result = await coursesCollection.find().toArray();
       res.send(result);
     })
 
-
-    // Users Api Collection 
+    // ============= USERS =============
 
     app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -108,8 +132,10 @@ async function run() {
     });
 
 
-    // Cart collection --------------------------------------------
-    app.get("/carts", async (req, res) => {
+    // ============= CART =============
+
+
+    app.get("/carts", verifyJWT, async (req, res) => {
       const email = req.query.email;
       if (!email) {
         res.send([]);
