@@ -92,6 +92,32 @@ async function run() {
       res.send(result);
     });
 
+    // course approved
+    app.patch("/courses/approved/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: "approved",
+        },
+      };
+      const result = await coursesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    // Course denied
+    app.patch("/courses/denied/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: "denied",
+        },
+      };
+      const result = await coursesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     // ============= USERS =============
 
     app.get("/users", async (req, res) => {
