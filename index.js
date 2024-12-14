@@ -120,7 +120,7 @@ async function run() {
 
     // Get All User =============================================*
     // ==========================================================*
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
@@ -128,7 +128,8 @@ async function run() {
     // Get Instructor =============================================
     app.get("/instructor", async (req, res) => {
       const result = await usersCollection
-        .find({ role: "instructor" })
+        // .find({ role: "instructor" })
+        .find()
         .toArray();
       res.send(result);
     });
